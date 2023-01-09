@@ -13,6 +13,9 @@ const swaggerUi = require('swagger-ui-express')
 
 const port = config.express.port;
 
+const logger = require('./logger/my_logger')
+logger.info('test1')
+
 const app = express()
 
 // to use body parameters

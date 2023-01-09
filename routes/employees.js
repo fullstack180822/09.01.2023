@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const emp_repo = require('../dal/emp_repo')
+const logger = require('../logger/my_logger')
 
 /**
 *  @swagger
@@ -90,8 +91,12 @@ router.get('/:id', async (req, resp) => {
 })
 
 function is_valid_employee(obj) {
-    return obj.hasOwnProperty('name') && obj.hasOwnProperty('age') && 
-        obj.hasOwnProperty('address') && obj.hasOwnProperty('salary') 
+    const result =  obj.hasOwnProperty('name') && obj.hasOwnProperty('age') && 
+        obj.hasOwnProperty('address') && obj.hasOwnProperty('salary') ;
+    if (!result) {
+        logger.error(`bad object was recieved. ${JSON.stringify(obj)}`)
+    }
+    return result;
 }
 
 // ADD
