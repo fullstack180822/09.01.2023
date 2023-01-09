@@ -5,5 +5,8 @@
         "password": "admin",
         "database": "postgres",
         "version": 13
+    },
+    "express": {
+        "port": 8080
     }
 }

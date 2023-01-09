@@ -5,16 +5,13 @@ const path = require('path')
 const url = require('url')
 const cors = require('cors')
 const { response } = require('express')
-
+const config = require('config')
 const employeesRouter = require('./routes/employees')
 
 const swaggerJsdoc = require('swagger-jsdoc')
 const swaggerUi = require('swagger-ui-express')
 
-
-
-
-const port = 8080;
+const port = config.express.port;
 
 const app = express()
 

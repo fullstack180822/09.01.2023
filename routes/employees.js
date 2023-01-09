@@ -1,18 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const knex = require('knex')
-const config = require('config')
-
-const connectedKnex = knex({
-    client: 'pg',
-    version: config.db.version,
-    connection: {
-        host: config.db.host,
-        user: config.db.user,
-        password: config.db.password,
-        database: config.db.database
-    }
-})
+const emp_repo = require('../dal/emp_repo')
 
 /**
 *  @swagger
@@ -81,7 +69,7 @@ const connectedKnex = knex({
 */
 router.get('/', async (req, resp) => {
     try {
-        const employees = await connectedKnex('employee').select('*');
+        const employees = await emp_repo.get_all_emp();//connectedKnex('employee').select('*');
         console.log(employees);
         resp.status(200).json({ employees })
     }
@@ -93,7 +81,7 @@ router.get('/', async (req, resp) => {
 // get end point by id
 router.get('/:id', async (req, resp) => {
     try {
-        const employees = await connectedKnex('employee').select('*').where('id', req.params.id).first()
+        const employees = await emp_repo.get_emp_by_id(req.params.id)
         resp.status(200).json(employees)
     }
     catch (err) {
@@ -115,7 +103,7 @@ router.post('/', async (req, resp) => {
             resp.status(400).json({ error: 'values of employee are not llegal'})
             return
         }
-        const result = await connectedKnex('employee').insert(employee)
+        const result = await emp_repo.insert_emp(employee)
         resp.status(201).json({
              new_employee : { ...employee, ID: result[0] },
              url: `http://localhost:8080/employee/${result}` 
@@ -136,7 +124,7 @@ router.put('/:id', async (req, resp) => {
             resp.status(400).json({ error: 'values of employee are not llegal'})
             return
         }
-        const result = await connectedKnex('employee').where('id', req.params.id).update(employee)
+        const result = await emp_repo.update_emp(req.params.id, employee)
         resp.status(200).json({
              status: 'updated',
              'how many rows updated': result
@@ -149,7 +137,7 @@ router.put('/:id', async (req, resp) => {
 // DELETE 
 router.delete('/:id', async (req, resp) => {
     try {
-        const result = await connectedKnex('employee').where('id', req.params.id).del()
+        const result = await emp_repo.del_emp_by_id(req.params.id)
         resp.status(200).json({
             status: 'success',
             "how many deleted": result
