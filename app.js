@@ -5,19 +5,13 @@ const path = require('path')
 const url = require('url')
 const cors = require('cors')
 const { response } = require('express')
-const knex = require('knex')
-const config = require('config')
 
-const connectedKnex = knex({
-    client: 'pg',
-    version: config.db.version,
-    connection: {
-        host: config.db.host,
-        user: config.db.user,
-        password: config.db.password,
-        database: config.db.database
-    }
-})
+const employeesRouter = require('./routes/employees')
+
+const swaggerJsdoc = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
+
+
 
 
 const port = 8080;
@@ -68,103 +62,37 @@ app.get('/add', (req, resp) => {
     //resp.end(`${JSON.stringify(req.query.x)}`)
 })
 
-// ========================================== REST
-// REST BASIC:
-// 1.GET 2. GET by ID 3.POST (one-item) 4.PUT (update/replace/insert) 5.DELETE 6.PATCH (update only)
-// EXTRA ==>
-//  7.POST-MANY (json array)
-//  8 SMART GET query params
-// GRAPH-QL
-// get all
-app.get('/employee', async (req, resp) => {
-    try {
-        const employees = await connectedKnex('employee').select('*');
-        console.log(employees);
-        resp.status(200).json({ employees })
-    }
-    catch (err) {
-        resp.status(500).json({ "error": err.message })
-    }
-})
-// get end point by id
-app.get('/employee/:id', async (req, resp) => {
-    try {
-        const employees = await connectedKnex('employee').select('*').where('id', req.params.id).first()
-        resp.status(200).json(employees)
-    }
-    catch (err) {
-        resp.status(500).json({ "error": err.message })
-    }
-})
-
-function is_valid_employee(obj) {
-    return obj.hasOwnProperty('name') && obj.hasOwnProperty('age') && 
-        obj.hasOwnProperty('address') && obj.hasOwnProperty('salary') 
-}
-
-// ADD
-app.post('/employee', async (req, resp) => {
-    console.log(req.body);
-    const employee = req.body
-    try {
-        if (! is_valid_employee (employee)) {
-            resp.status(400).json({ error: 'values of employee are not llegal'})
-            return
-        }
-        const result = await connectedKnex('employee').insert(employee)
-        resp.status(201).json({
-             new_employee : { ...employee, ID: result[0] },
-             url: `http://localhost:8080/employee/${result}` 
-            })
-    }
-    catch (err) {
-        console.log(err);
-        resp.status(500).json({ "error": err.message })
-    }
-})
-
-// PUT -- UPDATE/replace (or insert)
-app.put('/employee/:id', async (req, resp) => {
-    console.log(req.body);
-    const employee = req.body
-    try {
-        if (! is_valid_employee (employee)) {
-            resp.status(400).json({ error: 'values of employee are not llegal'})
-            return
-        }
-        const result = await connectedKnex('employee').where('id', req.params.id).update(employee)
-        resp.status(200).json({
-             status: 'updated',
-             'how many rows updated': result
-            })
-    }
-    catch (err) {
-        resp.status(500).json({ "error": err.message })
-    }
-})
-// DELETE 
-app.delete('/employee/:id', async (req, resp) => {
-    try {
-        const result = await connectedKnex('employee').where('id', req.params.id).del()
-        resp.status(200).json({
-            status: 'success',
-            "how many deleted": result
-        })
-    }
-    catch (err) {
-        resp.status(500).json({ "error": err.message })
-    }
-
-})
-// PATCH -- UPDATE 
-app.patch('/employee/:id', (req, resp) => {
-    console.log(req.params.id);
-    // actually delete ... later
-    // response
-    resp.writeHead(200)
-    resp.end('Successfully updated patched')
-})
+// ============================================
+// == move all REST API to routes/employees.js
+// ============================================
 
 app.listen(port, () => {
     console.log(`Listening to port ${port}`);
 })
+
+const options = {
+    definition: {
+      openapi: "3.0.0",
+      info: {
+        title: "Library API",
+        version: "1.0.0",
+        description:"A simple Express Library API",
+      },
+      servers: [
+        {
+          url: "http://localhost:8080/",
+        },
+      ],
+    },
+    apis: ["./routes/*.js"],
+  };
+  
+  const specs = swaggerJsdoc(options);
+
+app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(specs)
+  );
+
+  app.use('/employee', employeesRouter)
