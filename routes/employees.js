@@ -116,6 +116,7 @@ router.post('/', async (req, resp) => {
     }
     catch (err) {
         console.log(err);
+        logger.error(`error during POST in employees router. employee = ${JSON.stringify(employee)} ${err.message}`)
         resp.status(500).json({ "error": err.message })
     }
 })

@@ -14,9 +14,13 @@ const logger = createLogger({
     ]
 })
 
-logger.log({
+logger.info({
   level: 'info',
   message: 'What time is the testing at?'
 });
+
+// logger.info(
+//     'What time is the testing at?'
+//     );
 
 module.exports = logger
