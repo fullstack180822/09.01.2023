@@ -21,7 +21,7 @@ const get_emp_by_id = id => {
 }
 
 const insert_emp = employee => {
-    return connectedKnex('employee').insert(employee)
+    return connectedKnex('employee').returning('id').insert(employee)
 }
 
 const update_emp = (id, employee) => {
