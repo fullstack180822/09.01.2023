@@ -7,13 +7,13 @@ const cors = require('cors')
 const { response } = require('express')
 const config = require('config')
 const employeesRouter = require('./routes/employees')
+const logger = require('./logger/my_logger')
 
 const swaggerJsdoc = require('swagger-jsdoc')
 const swaggerUi = require('swagger-ui-express')
 
 const port = config.express.port;
 
-const logger = require('./logger/my_logger')
 logger.info('test1')
 
 const app = express()
@@ -29,6 +29,7 @@ app.use(express.static(path.join('.', '/static/'))) // /static/index.html
 
 app.listen(port, () => {
     console.log(`Listening to port ${port}`);
+    logger.info(`======================== system up ===========================`)
 })
 
 const options = {
@@ -58,3 +59,4 @@ app.use(
 
   app.use('/employee', employeesRouter)
   
+  logger.debug('this is a debug message')

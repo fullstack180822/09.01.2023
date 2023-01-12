@@ -21,6 +21,7 @@ const get_emp_by_id = id => {
 }
 
 const insert_emp = employee => {
+    //logger.debug(`emp_repo func insert_emp. parameter: ${JSON.stringify(employee)}`)
     return connectedKnex('employee').returning('id').insert(employee)
 }
 

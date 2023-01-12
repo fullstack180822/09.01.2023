@@ -82,10 +82,12 @@ router.get('/', async (req, resp) => {
 // get end point by id
 router.get('/:id', async (req, resp) => {
     try {
+        logger.debug(`[employees router][router.get] parameter :id = ${req.params.id}`)
         const employees = await emp_repo.get_emp_by_id(req.params.id)
         resp.status(200).json(employees)
     }
     catch (err) {
+        logger.error(`[employees router][router.get] ${err}`)
         resp.status(500).json({ "error": err.message })
     }
 })
@@ -137,6 +139,8 @@ router.put('/:id', async (req, resp) => {
             })
     }
     catch (err) {
+        logger.error(`[employees router][router.get] ERROR: error during PUT.` +
+                     `employee = ${JSON.stringify(employee)} message = ${err.message} req.body = ${req.body}`); 
         resp.status(500).json({ "error": err.message })
     }
 })
